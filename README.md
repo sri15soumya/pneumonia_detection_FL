@@ -113,19 +113,4 @@ Get it from [Kaggle](https://www.kaggle.com/datasets/paultimothymooney/chest-xra
 Base_model_A.ipynb  →  Base_model_B.ipynb  →  Model1 / Model2 / Model3
 ```
 
----
 
-## Tech Stack
-
-- Python, TensorFlow, Keras
-- NumPy, Matplotlib
-- Jupyter Notebook
-
----
-
-## Authors
-
-- Vridhi Rajput — [23BDS1050]
-- B Sri Soumya — [23BDS1054]
-
-VIT Chennai | April 2026
