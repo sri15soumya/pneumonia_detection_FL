@@ -1,73 +1,131 @@
 # Pneumonia Detection Using Federated Learning
 
-## Overview
-This project implements pneumonia detection using deep learning models with federated learning approach. The repository contains three distinct models trained on chest X-ray datasets across distributed clients using federated learning protocols.
+A privacy-preserving chest X-ray classifier that detects pneumonia without sharing raw patient data across hospitals — built using Federated Learning and CNNs.
 
-## Project Structure
-- **Model1.ipynb** - First pneumonia detection model
-- **Model2.ipynb** - Second pneumonia detection model
-- **Model3.ipynb** - Third pneumonia detection model
-- **client_1.ipynb** - Federated learning client 1
-- **client_2.ipynb** - Federated learning client 2
+![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange?style=flat-square)
+![Keras](https://img.shields.io/badge/Keras-red?style=flat-square)
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-yellow?style=flat-square)
 
-## Models
-The project implements three different models for pneumonia detection:
+---
 
-### Model 1
-Deep learning model for pneumonia detection
+## What This Project Does
 
-### Model 2
-Enhanced pneumonia detection model
+Two simulated hospital clients each train a CNN on their own private chest X-ray dataset. Instead of sharing patient images, they only send their **model weights** to a central server, which merges them into one global model. That global model is sent back to each hospital for final fine-tuning.
 
-### Model 3
-Advanced pneumonia detection model
+We compare **3 different ways** of merging the models to see which gives the best and fairest result.
 
-## Federated Learning Setup
-The federated learning implementation uses distributed clients to train models on decentralized datasets while maintaining data privacy.
+---
+
+## The 3 Aggregation Strategies
+
+| Model | Strategy | How it works |
+|-------|----------|--------------|
+| Model 1 | Accuracy-Weighted | Clients with better accuracy get more influence |
+| Model 2 | Sample-Weighted (FedAvg) | Clients with more data get more influence |
+| Model 3 | Uniform Averaging | Both clients treated equally |
+
+---
+
+## Dataset
+
+**Chest X-Ray Images (Pneumonia)** — [Kaggle Link](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
+
+- Binary classification: **Normal vs Pneumonia**
+- ~5,800 chest X-ray images total
+- Split between two simulated clients:
+  - **Client A** — 5,216 training images, 624 test images
+  - **Client B** — 4,684 training images, 1,172 test images
+
+---
+
+## Model Architecture
+
+Same CNN used across all three models for a fair comparison:
+
+```
+Input (224 × 224 grayscale)
+→ Conv2D(32) + MaxPool
+→ Conv2D(64) + MaxPool + Dropout(0.3)
+→ Conv2D(128) + MaxPool + Dropout(0.4)
+→ Dense(128) + Dropout(0.5)
+→ Output: Sigmoid (Normal / Pneumonia)
+```
+
+Trained for 20 epochs per client, fine-tuned for 20 epochs after federation.
+
+---
 
 ## Results
 
-### Model 1
-- **Dataset A Performance:**
-  - Accuracy: [Add metrics]
-  - Precision: [Add metrics]
-  - Recall: [Add metrics]
-  - F1-Score: [Add metrics]
+### Before Federation (baseline — independent training)
 
-### Model 2
-- **Dataset B Performance:**
-  - Accuracy: [Add metrics]
-  - Precision: [Add metrics]
-  - Recall: [Add metrics]
-  - F1-Score: [Add metrics]
+| Client | Own Dataset Accuracy |
+|--------|----------------------|
+| Client A | 76.44% |
+| Client B | 93.09% |
 
-### Model 3
-- **Dataset B Performance:**
-  - Accuracy: [Add metrics]
-  - Precision: [Add metrics]
-  - Recall: [Add metrics]
-  - F1-Score: [Add metrics]
+### After Federation (own dataset performance)
 
-## Technologies Used
-- Python
-- Jupyter Notebook
-- TensorFlow/Keras or PyTorch
-- Federated Learning Framework
+| Model | Strategy | Client A Accuracy | Client B Accuracy |
+|-------|----------|-------------------|-------------------|
+| Model 1 | Accuracy-Weighted | **88.30%** | **96.16%** |
+| Model 2 | Sample-Weighted | 89.10% | 96.50% |
+| Model 3 | Uniform | 86.38% | 96.84% |
 
-## Usage
-Each notebook (Model1, Model2, Model3) can be run independently in Jupyter Notebook environment. The client notebooks demonstrate the federated learning setup.
+**Model 1 wins overall** — it's the most balanced across both clients. Model 2 peaks higher but favours the larger client. Model 3 crashed to 38% accuracy before fine-tuning, making it unreliable at scale.
 
-## Dataset
-The models are trained on chest X-ray images for pneumonia detection classification.
+---
+
+## Project Structure
+
+```
+pneumonia_detection_FL/
+├── Base_model_A.ipynb      # Client A standalone training
+├── Base_model_B.ipynb      # Client B standalone training
+├── Model1.ipynb            # Federated: Accuracy-Weighted
+├── Model2.ipynb            # Federated: Sample-Weighted (FedAvg)
+├── Model3.ipynb            # Federated: Uniform Averaging
+└── README.md
+```
+
+---
 
 ## Getting Started
-1. Clone the repository
-2. Install required dependencies
-3. Open the desired model notebook in Jupyter
-4. Run the cells to train and evaluate the model
 
-## License
-This project is open source.
+**1. Clone the repo**
+```bash
+git clone https://github.com/sri15soumya/pneumonia_detection_FL.git
+cd pneumonia_detection_FL
+```
 
-## Author
-sri15soumya
+**2. Install dependencies**
+```bash
+pip install tensorflow keras numpy matplotlib scikit-learn jupyter
+```
+
+**3. Download the dataset**
+
+Get it from [Kaggle](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia) and place it in your working directory.
+
+**4. Run notebooks in this order**
+```
+Base_model_A.ipynb  →  Base_model_B.ipynb  →  Model1 / Model2 / Model3
+```
+
+---
+
+## Tech Stack
+
+- Python, TensorFlow, Keras
+- NumPy, Matplotlib
+- Jupyter Notebook
+
+---
+
+## Authors
+
+- Vridhi Rajput — [23BDS1050]
+- B Sri Soumya — [23BDS1054]
+
+VIT Chennai | April 2026
